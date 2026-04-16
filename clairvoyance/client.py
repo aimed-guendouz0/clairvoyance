@@ -56,6 +56,12 @@ class Client(IClient):  # pylint: disable=too-many-instance-attributes
                     self._url,
                     json=gql_document,
                     proxy=self.proxy,
+                    headers={
+                        **(self._headers or {}),
+                        "Content-Type": "application/json",
+                        "apollographql-client-name": "web",
+                        "apollographql-client-version": "1.0.0",
+                    }
                 )
 
                 if response.status >= 500:
