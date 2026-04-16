@@ -62,6 +62,20 @@ class Client(IClient):  # pylint: disable=too-many-instance-attributes
                     log().warning(f"Received status code {response.status}")
                     return await self.post(document, retries + 1)
 
+                if response.status == 429:
+                    retry_after = response.headers.get("Retry-After")
+                    if retry_after is not None:
+                        try:
+                            wait = float(retry_after)
+                        except ValueError:
+                            wait = 60.0
+                    else:
+                        wait = float(self.backoff) if self.backoff else 60.0
+                    log().warning(
+                        f"Received status code 429 (Too Many Requests). Waiting {wait} seconds before retrying."
+                    )
+                    await asyncio.sleep(wait)
+                    return await self.post(document, retries + 1)
                 try:
                     return await response.json(content_type=None)
                 except json.decoder.JSONDecodeError as e:
