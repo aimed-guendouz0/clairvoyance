@@ -68,9 +68,9 @@ class Client(IClient):  # pylint: disable=too-many-instance-attributes
                         try:
                             wait = float(retry_after)
                         except ValueError:
-                            wait = 60.0
+                            wait = 5.0
                     else:
-                        wait = float(self.backoff) if self.backoff else 60.0
+                        wait = float(self.backoff) if self.backoff else 5.0
                     log().warning(
                         f"Received status code 429 (Too Many Requests). Waiting {wait} seconds before retrying."
                     )
